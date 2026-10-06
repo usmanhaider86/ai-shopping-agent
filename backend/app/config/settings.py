@@ -20,5 +20,7 @@ class Settings:
     MONGODB_DB: str = os.getenv("MONGODB_DB", "shopping_db")
     MONGODB_COLLECTION: str = os.getenv("MONGODB_COLLECTION", "products")
 
+    CORS_ORIGINS: str = os.getenv("CORS_ORIGINS", "") or ""
+
 
 settings = Settings()
