@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* AI Shopping Agent — Premium e-commerce design system.
+   All colors are HSL. Tokens only — never hardcode in components. */
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Brand: deep teal */
+    --primary: 178 78% 32%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 174 72% 56%;
+
+    /* Accent: warm coral for CTAs / best-choice */
+    --accent: 12 92% 62%;
+    --accent-foreground: 0 0% 100%;
+    --accent-glow: 24 95% 70%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --rating: 38 92% 50%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 178 78% 32%;
+
+    --radius: 1rem;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(178 78% 32%) 0%, hsl(200 80% 40%) 50%, hsl(255 70% 55%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(var(--accent-glow)) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 40% 98%) 100%);
+    --gradient-best: linear-gradient(135deg, hsl(12 92% 62% / 0.12) 0%, hsl(38 92% 60% / 0.12) 100%);
+
+    /* Shadows */
+    --shadow-soft: 0 1px 2px hsl(222 47% 11% / 0.04), 0 2px 8px hsl(222 47% 11% / 0.04);
+    --shadow-card: 0 4px 16px -4px hsl(178 78% 32% / 0.08), 0 2px 6px hsl(222 47% 11% / 0.04);
+    --shadow-hover: 0 18px 40px -12px hsl(178 78% 32% / 0.22), 0 8px 16px -8px hsl(222 47% 11% / 0.08);
+    --shadow-best: 0 24px 48px -16px hsl(12 92% 62% / 0.35);
+    --shadow-glow: 0 0 40px hsl(174 72% 56% / 0.35);
+
+    /* Motion */
+    --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+    --transition-base: all 280ms var(--ease-out-quart);
+    --transition-fast: all 160ms var(--ease-out-quart);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222 47% 7%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 40% 11%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 40% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 174 72% 52%;
+    --primary-foreground: 222 47% 7%;
+    --primary-glow: 178 80% 60%;
+
+    --accent: 12 92% 62%;
+    --accent-foreground: 0 0% 100%;
+    --accent-glow: 24 95% 68%;
+
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 70%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --rating: 38 92% 56%;
+
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 174 72% 52%;
+
+    --gradient-hero: linear-gradient(135deg, hsl(178 78% 22%) 0%, hsl(220 70% 20%) 50%, hsl(260 60% 25%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(222 40% 13%) 0%, hsl(222 40% 10%) 100%);
+    --gradient-best: linear-gradient(135deg, hsl(12 92% 62% / 0.18) 0%, hsl(38 92% 60% / 0.12) 100%);
+
+    --shadow-card: 0 4px 16px -4px hsl(0 0% 0% / 0.4), 0 2px 6px hsl(0 0% 0% / 0.3);
+    --shadow-hover: 0 18px 40px -12px hsl(174 72% 52% / 0.35), 0 8px 16px -8px hsl(0 0% 0% / 0.4);
+    --shadow-best: 0 24px 48px -16px hsl(12 92% 62% / 0.4);
+    --shadow-glow: 0 0 40px hsl(178 80% 60% / 0.4);
+
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+}
+
+@layer utilities {
+  .bg-gradient-hero { background-image: var(--gradient-hero); }
+  .bg-gradient-primary { background-image: var(--gradient-primary); }
+  .bg-gradient-accent { background-image: var(--gradient-accent); }
+  .bg-gradient-card { background-image: var(--gradient-card); }
+  .bg-gradient-best { background-image: var(--gradient-best); }
+
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .shadow-hover { box-shadow: var(--shadow-hover); }
+  .shadow-best { box-shadow: var(--shadow-best); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+
+  .transition-base { transition: var(--transition-base); }
+  .transition-fast { transition: var(--transition-fast); }
+
+  .text-balance { text-wrap: balance; }
+}
+
+/* Markdown panel typography */
+.prose-shopping {
+  @apply text-sm leading-relaxed text-foreground/90;
+}
+.prose-shopping h1, .prose-shopping h2, .prose-shopping h3 {
+  @apply font-semibold text-foreground mt-4 mb-2;
+}
+.prose-shopping h3 { @apply text-base; }
+.prose-shopping ul { @apply list-disc pl-5 space-y-1 my-2; }
+.prose-shopping ol { @apply list-decimal pl-5 space-y-1 my-2; }
+.prose-shopping a { @apply text-primary underline underline-offset-2 hover:text-primary-glow; }
+.prose-shopping code { @apply bg-muted px-1.5 py-0.5 rounded text-xs; }
+.prose-shopping strong { @apply text-foreground font-semibold; }

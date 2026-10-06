@@ -1,0 +1,8 @@
+.env
+.venv/
+__pycache__/
+check_rapidapi.py
+check_groq_models.py
+check_prices.py
+*.pyc
+.vscode/

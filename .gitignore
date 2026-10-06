@@ -1,0 +1,11 @@
+# Secrets
+.env
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+project_structure.txt
+backend/lovable_frontend_prompt.txt
