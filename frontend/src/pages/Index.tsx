@@ -230,6 +230,7 @@ const Index = () => {
                     budgetNote={state.data.budget_note}
                   />
                   <EmptyState
+                    title={state.data.intent === "unavailable" ? "Product source is busy" : undefined}
                     message={state.data.message || state.data.recommendation}
                     onRetry={() => runSearch(state.query)}
                   />

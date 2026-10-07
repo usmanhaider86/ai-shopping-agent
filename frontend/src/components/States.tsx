@@ -19,9 +19,11 @@ export function IdleState() {
 }
 
 export function EmptyState({
+  title,
   message,
   onRetry,
 }: {
+  title?: string;
   message?: string;
   onRetry?: () => void;
 }) {
@@ -31,7 +33,7 @@ export function EmptyState({
         <SearchX className="h-6 w-6" />
       </div>
       <h2 className="mt-4 font-display text-xl font-semibold">
-        No matching products found
+        {title || "No matching products found"}
       </h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
         {message ||

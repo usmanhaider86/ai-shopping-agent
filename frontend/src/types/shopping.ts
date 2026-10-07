@@ -33,7 +33,7 @@ export interface SearchResponse {
   recommendation: string;
   message: string;
   markdown_result: string;
-  intent?: "shopping" | "chat" | "no_results" | "error";
+  intent?: "shopping" | "chat" | "no_results" | "unavailable" | "error";
   suggestions?: string[];
   budget_note?: string;
   keywords?: string[];

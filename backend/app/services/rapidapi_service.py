@@ -1,6 +1,8 @@
 import copy
 import math
 import re
+import threading
+import time
 from typing import Any
 
 import requests
@@ -8,6 +10,22 @@ import requests
 from app.config.settings import settings
 from app.safe_log import safe_for_console
 from app.services.cache import TTLCache
+
+_RATE_LIMIT_COOLDOWN_SECONDS = 300
+_limited_until = 0.0
+_lock = threading.Lock()
+
+
+def is_rate_limited() -> bool:
+    with _lock:
+        return time.monotonic() < _limited_until
+
+
+def mark_rate_limited() -> None:
+    global _limited_until
+    with _lock:
+        _limited_until = time.monotonic() + _RATE_LIMIT_COOLDOWN_SECONDS
+
 
 _cache = TTLCache(
     ttl_seconds=settings.CACHE_TTL_SECONDS,
@@ -71,6 +89,10 @@ def search_products_rapidapi(
         print("[RapidAPI] cache hit")
         return copy.deepcopy(cached)
 
+    if is_rate_limited():
+        print("[RapidAPI] skipped: quota cooldown")
+        return []
+
     q = " ".join(keywords).strip() or "electronics"
     if (category or "").lower() == "smartphone" and "phone" not in q.lower():
         q = f"smartphone {q}".strip()
@@ -94,6 +116,16 @@ def search_products_rapidapi(
     try:
         r = requests.get(url, headers=headers, params=params, timeout=8)
         print("[RapidAPI] status:", r.status_code)
+        headers_obj = getattr(r, "headers", None)
+        if headers_obj and hasattr(headers_obj, "items"):
+            for k, v in headers_obj.items():
+                if str(k).lower() == "x-ratelimit-requests-remaining":
+                    print(f"[RapidAPI] quota remaining: {v}")
+                    break
+        if r.status_code == 429:
+            mark_rate_limited()
+            print("[RapidAPI] quota exhausted or rate limited; pausing requests for 5 minutes")
+            return []
         r.raise_for_status()
         data = r.json()
     except Exception as e:

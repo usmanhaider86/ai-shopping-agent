@@ -13,7 +13,7 @@ class SearchResponse(BaseModel):
     recommendation: str = ""
     message: str = ""
     markdown_result: str = ""
-    intent: Literal["shopping", "chat", "no_results", "error"] = "shopping"
+    intent: Literal["shopping", "chat", "no_results", "unavailable", "error"] = "shopping"
     suggestions: list[str] = Field(default_factory=list)
     budget_note: str = ""
     keywords: list[str] = Field(default_factory=list)

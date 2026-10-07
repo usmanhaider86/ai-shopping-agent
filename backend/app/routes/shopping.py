@@ -9,6 +9,7 @@ from app.agent.parser import _PRICE_PATTERNS, _STOP, parse_query
 from app.config.settings import settings
 from app.models.schema import SearchRequest, SearchResponse
 from app.safe_log import safe_for_console
+from app.services import rapidapi_service
 from app.services.rate_limit import rate_limiter
 
 router = APIRouter()
@@ -205,6 +206,18 @@ async def shopping_search(body: SearchRequest, request: Request) -> SearchRespon
         budget_note = str(parsed.get("budget_note") or "")
         products = await run_shopping_graph_async(query)
         if not products:
+            if rapidapi_service.is_rate_limited():
+                return SearchResponse(
+                    products=[],
+                    best_choice=None,
+                    recommendation="",
+                    message="The product source is temporarily at its request limit. Please try again in a little while.",
+                    markdown_result="",
+                    intent="unavailable",
+                    suggestions=[],
+                    budget_note=budget_note,
+                    keywords=parsed.get("keywords") or [],
+                )
             if budget_note:
                 no_res_msg = (
                     f"I couldn't find matching products in your {budget_note} range. "
