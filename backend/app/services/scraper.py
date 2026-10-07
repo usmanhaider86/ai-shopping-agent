@@ -4,7 +4,11 @@ from urllib.parse import quote_plus
 
 from playwright.sync_api import sync_playwright
 
+from app.config.settings import settings
 from app.safe_log import safe_for_console
+from app.services.circuit import Breaker
+
+scraper_breaker = Breaker("scraper", settings.SOURCE_FAILURE_COOLDOWN_SECONDS)
 
 
 def _parse_price_text(text: str) -> float | None:
@@ -20,6 +24,10 @@ def _parse_price_text(text: str) -> float | None:
 
 
 def scrape_products(keywords: list[str], limit: int = 5) -> list[dict[str, Any]]:
+    if not scraper_breaker.allow():
+        print("[Scraper] skipped: cooling down")
+        return []
+
     q = " ".join(keywords).strip() or "shopping deals"
     try:
         with sync_playwright() as p:
@@ -71,7 +79,9 @@ def scrape_products(keywords: list[str], limit: int = 5) -> list[dict[str, Any]]
             context.close()
             browser.close()
             print("[Scraper] count:", len(out))
+            scraper_breaker.success()
             return out
     except Exception as e:
+        scraper_breaker.failure()
         print("[Scraper] error:", safe_for_console(e))
         return []

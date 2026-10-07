@@ -29,5 +29,10 @@ class Settings:
     # Per-IP rate limit (0 or negative disables)
     RATE_LIMIT_PER_MINUTE: int = int(os.getenv("RATE_LIMIT_PER_MINUTE", "10") or "10")
 
+    # Cooldown seconds when a data source fails (MongoDB or Playwright scraper)
+    SOURCE_FAILURE_COOLDOWN_SECONDS: int = int(
+        os.getenv("SOURCE_FAILURE_COOLDOWN_SECONDS", "600") or "600"
+    )
+
 
 settings = Settings()

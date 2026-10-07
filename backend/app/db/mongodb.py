@@ -6,6 +6,9 @@ from pymongo.errors import PyMongoError
 
 from app.config.settings import settings
 from app.safe_log import safe_for_console
+from app.services.circuit import Breaker
+
+mongo_breaker = Breaker("mongodb", settings.SOURCE_FAILURE_COOLDOWN_SECONDS)
 
 
 def _build_name_filter(keywords: list[str]) -> dict[str, Any]:
@@ -25,6 +28,13 @@ def search_products(
     raw_query: str = "",
     limit: int = 5,
 ) -> list[dict[str, Any]]:
+    if not settings.MONGODB_URI or not settings.MONGODB_URI.strip():
+        return []
+
+    if not mongo_breaker.allow():
+        print("[MongoDB] skipped: cooling down")
+        return []
+
     name_filter = _build_name_filter(keywords)
     if not name_filter and raw_query.strip():
         snippet = " ".join(raw_query.split())[:120]
@@ -54,10 +64,13 @@ def search_products(
             doc.setdefault("source", "mongodb")
             out.append(doc)
         client.close()
+        mongo_breaker.success()
         return out
     except PyMongoError as e:
+        mongo_breaker.failure()
         print("[MongoDB] error:", safe_for_console(e))
         return []
     except Exception as e:
+        mongo_breaker.failure()
         print("[MongoDB] unexpected:", safe_for_console(e))
         return []
