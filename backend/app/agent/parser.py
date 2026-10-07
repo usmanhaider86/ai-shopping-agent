@@ -265,6 +265,7 @@ def _extract_keywords_heuristic(text: str) -> list[str]:
 def _sanitize_keywords(keywords: list[str], heuristic_keywords: list[str]) -> list[str]:
     flat_words: list[str] = []
     seen: set[str] = set()
+    heuristic_set = {str(hk).lower() for hk in (heuristic_keywords or [])}
 
     for k in keywords or []:
         s = str(k)
@@ -274,8 +275,9 @@ def _sanitize_keywords(keywords: list[str], heuristic_keywords: list[str]) -> li
         for w in tokens:
             if w in _STOP:
                 continue
-            if w.isdigit() and (len(w) < 2 or len(w) > 4):
-                continue
+            if w.isdigit():
+                if len(w) < 2 or len(w) > 4 or w not in heuristic_set:
+                    continue
             if w not in seen:
                 seen.add(w)
                 flat_words.append(w)
@@ -367,7 +369,12 @@ def _maybe_enrich_with_groq(query: str, base: dict[str, Any]) -> dict[str, Any]:
                 merged["max_price"] = float(mp)
         cat = parsed.get("category")
         if isinstance(cat, str) and cat.strip():
-            merged["category"] = cat.strip().lower()
+            cat_str = cat.strip().lower()
+            heuristic_cat = base.get("category")
+            if cat_str == "general" or (
+                cat_str == "smartphone" and heuristic_cat == "smartphone"
+            ):
+                merged["category"] = cat_str
         cur = parsed.get("currency")
         if isinstance(cur, str) and cur.strip():
             merged["currency"] = cur.strip().upper()
