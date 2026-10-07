@@ -22,5 +22,12 @@ class Settings:
 
     CORS_ORIGINS: str = os.getenv("CORS_ORIGINS", "") or ""
 
+    # RapidAPI result cache
+    CACHE_TTL_SECONDS: int = int(os.getenv("CACHE_TTL_SECONDS", "3600") or "3600")
+    CACHE_MAX_ENTRIES: int = int(os.getenv("CACHE_MAX_ENTRIES", "200") or "200")
+
+    # Per-IP rate limit (0 or negative disables)
+    RATE_LIMIT_PER_MINUTE: int = int(os.getenv("RATE_LIMIT_PER_MINUTE", "10") or "10")
+
 
 settings = Settings()

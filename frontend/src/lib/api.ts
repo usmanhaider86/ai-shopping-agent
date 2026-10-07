@@ -61,6 +61,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
         payload,
       );
     }
+    if (res.status === 429) {
+      throw new ApiError(
+        "You're searching too fast. Please wait a moment and try again.",
+        429,
+        payload,
+      );
+    }
     throw new ApiError(
       `Request failed with status ${res.status}.`,
       res.status,

@@ -1,13 +1,15 @@
 import asyncio
 import re
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, Request
 
 from app.agent.agent import run_shopping_graph_async
 from app.agent.intent import SUGGESTIONS, is_smalltalk, smalltalk_reply
 from app.agent.parser import _PRICE_PATTERNS, _STOP, parse_query
+from app.config.settings import settings
 from app.models.schema import SearchRequest, SearchResponse
 from app.safe_log import safe_for_console
+from app.services.rate_limit import rate_limiter
 
 router = APIRouter()
 
@@ -162,7 +164,24 @@ def _build_markdown_result(
 
 
 @router.post("/shopping/search", response_model=SearchResponse)
-async def shopping_search(body: SearchRequest) -> SearchResponse:
+async def shopping_search(body: SearchRequest, request: Request) -> SearchResponse:
+    # ── Rate-limit check (before the try so 429 is never swallowed) ─
+    if settings.RATE_LIMIT_PER_MINUTE > 0:
+        forwarded = request.headers.get("x-forwarded-for")
+        if forwarded:
+            client_ip = forwarded.split(",")[0].strip()
+        else:
+            client_ip = request.client.host if request.client else "unknown"
+        allowed, retry_after = rate_limiter.check(
+            client_ip, settings.RATE_LIMIT_PER_MINUTE
+        )
+        if not allowed:
+            raise HTTPException(
+                status_code=429,
+                detail="Too many requests. Please wait a moment and try again.",
+                headers={"Retry-After": str(retry_after)},
+            )
+
     try:
         query = body.query.strip()
 
@@ -277,6 +296,8 @@ async def shopping_search(body: SearchRequest) -> SearchResponse:
             budget_note=budget_note,
             keywords=parsed.get("keywords") or [],
         )
+    except HTTPException:
+        raise
     except Exception as e:
         print("[shopping_search] error:", safe_for_console(e))
         return SearchResponse(

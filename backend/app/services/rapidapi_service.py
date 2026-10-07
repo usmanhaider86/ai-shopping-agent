@@ -1,3 +1,4 @@
+import copy
 import math
 import re
 from typing import Any
@@ -6,6 +7,12 @@ import requests
 
 from app.config.settings import settings
 from app.safe_log import safe_for_console
+from app.services.cache import TTLCache
+
+_cache = TTLCache(
+    ttl_seconds=settings.CACHE_TTL_SECONDS,
+    max_entries=settings.CACHE_MAX_ENTRIES,
+)
 
 
 def _parse_price(value: Any) -> float | None:
@@ -50,6 +57,19 @@ def search_products_rapidapi(
     if not settings.RAPIDAPI_KEY:
         print("[RapidAPI] skipped: no RAPIDAPI_KEY")
         return []
+
+    # ── Cache lookup ──────────────────────────────────────────────
+    cache_key = "|".join([
+        " ".join(kw.strip().lower() for kw in keywords),
+        (category or "").lower(),
+        str(limit),
+        str(int(min_price)) if min_price is not None else "None",
+        str(math.ceil(max_price)) if max_price is not None else "None",
+    ])
+    cached = _cache.get(cache_key)
+    if cached is not None:
+        print("[RapidAPI] cache hit")
+        return copy.deepcopy(cached)
 
     q = " ".join(keywords).strip() or "electronics"
     if (category or "").lower() == "smartphone" and "phone" not in q.lower():
@@ -161,4 +181,6 @@ def search_products_rapidapi(
             }
         )
     print("[RapidAPI] parsed count:", len(out))
+    if out:
+        _cache.set(cache_key, copy.deepcopy(out))
     return out
