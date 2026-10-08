@@ -1,3 +1,13 @@
+---
+title: AI Shopping Agent API
+emoji: 🛒
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # AI Shopping Agent (Backend)
 
 FastAPI service that searches products using **MongoDB → RapidAPI (Amazon) → Playwright (eBay)**, with optional **Groq** for light query understanding. When no matching products are found, the API returns an empty list with an honest message instead of fabricated data.
