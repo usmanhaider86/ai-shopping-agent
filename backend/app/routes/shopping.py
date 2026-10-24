@@ -18,6 +18,7 @@ router = APIRouter()
 _PRIOR_RATING = 4.0
 _PRIOR_WEIGHT = 500
 _RELEVANCE_WEIGHT = 0.30
+_MIN_REVIEWS_FOR_BEST = 10
 _EARBUD_WORDS = frozenset({"earbud", "earbuds", "earphone", "earphones", "buds"})
 _GENERIC_QUERY_WORDS = frozenset(
     {
@@ -270,7 +271,16 @@ async def shopping_search(body: SearchRequest, request: Request) -> SearchRespon
                         if isinstance(p.get("price"), (int, float))
                         and float(p["price"]) <= float(budget_cap)
                     ]
-                    best_choice = within_budget[0] if within_budget else valid_products[0]
+                    qualified = [
+                        p
+                        for p in within_budget
+                        if _parse_review_count(p.get("reviews")) >= _MIN_REVIEWS_FOR_BEST
+                    ]
+                    best_choice = (
+                        qualified[0]
+                        if qualified
+                        else (within_budget[0] if within_budget else valid_products[0])
+                    )
                 elif isinstance(max_price, (int, float)):
                     within_budget = [
                         p
@@ -278,9 +288,23 @@ async def shopping_search(body: SearchRequest, request: Request) -> SearchRespon
                         if isinstance(p.get("price"), (int, float))
                         and float(p["price"]) <= float(max_price)
                     ]
-                    best_choice = within_budget[0] if within_budget else valid_products[0]
+                    qualified = [
+                        p
+                        for p in within_budget
+                        if _parse_review_count(p.get("reviews")) >= _MIN_REVIEWS_FOR_BEST
+                    ]
+                    best_choice = (
+                        qualified[0]
+                        if qualified
+                        else (within_budget[0] if within_budget else valid_products[0])
+                    )
                 else:
-                    best_choice = valid_products[0]
+                    qualified = [
+                        p
+                        for p in valid_products
+                        if _parse_review_count(p.get("reviews")) >= _MIN_REVIEWS_FOR_BEST
+                    ]
+                    best_choice = qualified[0] if qualified else valid_products[0]
             else:
                 best_choice = ranked[0]
 
